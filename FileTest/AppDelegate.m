@@ -17,6 +17,68 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    
+    NSString *curDir = [fileManager currentDirectoryPath];
+    NSLog(@"Current dir = %@", curDir);
+    
+    NSArray *docDirs = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    
+    NSString *docDir = [docDirs objectAtIndex: 0];
+    NSLog(@"docDir = %@", docDir);
+    
+    
+    if([fileManager changeCurrentDirectoryPath: docDir] == YES) {
+        curDir = [fileManager currentDirectoryPath];
+        NSLog(@"Current dir = %@", curDir);
+    }
+    
+    
+    NSString *tmpDir = NSTemporaryDirectory();
+    NSLog(@"tmp dir = %@", tmpDir);
+    
+    
+    NSArray *fileList = [fileManager contentsOfDirectoryAtPath:docDir error:NULL];
+    NSLog(@"File List = %@", fileList);
+    
+    NSString *newDirName = @"Test";
+    
+    if([fileManager createDirectoryAtPath:newDirName withIntermediateDirectories:YES attributes:nil error:nil] == YES)
+    {
+        NSLog(@"폴더 생성");
+    }
+    
+    fileList = [fileManager contentsOfDirectoryAtPath: docDir error:nil];
+    NSLog(@"File List =%@", fileList);
+    
+    NSDictionary *attributes;
+    attributes = [fileManager attributesOfItemAtPath: docDir error:nil];
+    NSLog(@"파일 정보 %@", [attributes objectForKey:NSFileType]);
+    
+    NSArray *myArr1 = [NSArray arrayWithObjects:@"Test1", @"Test2", @"Test3", nil];
+    NSArray *myArr2 = [NSArray arrayWithObjects:@"Test1", @"Test2", nil];
+    
+    NSString *fileName1 = [NSString stringWithFormat: @"%@%@", docDir, @"/arr1.xml"];
+    NSString *fileName2 = [NSString stringWithFormat: @"%@%@", docDir, @"/arr2.xml"];
+
+    [myArr1 writeToFile:fileName1 atomically:YES];
+    [myArr2 writeToFile:fileName2 atomically:YES];
+    
+    NSString *newFileName1 = [NSString stringWithFormat:@"%@%@", docDir, @"/Test/array.xml"];
+    
+    if([fileManager moveItemAtPath:fileName1 toPath:newFileName1 error:nil] == YES) {
+        NSLog(@"파일 이름 변경");
+    }
+    
+    NSString *newFileName2 = [NSString stringWithFormat: @"%@%@", docDir, @"/Test/array2.xml"];
+    
+    if([fileManager copyItemAtPath:fileName2 toPath:newFileName2 error:nil] == YES) {
+        NSLog(@"파일 복사");
+    }
+    
+    if([fileManager fileExistsAtPath:newFileName2] == YES) {
+        NSLog(@"파일 존재함");
+    }
     return YES;
 }
 
